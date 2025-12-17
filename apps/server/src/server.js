@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import eventsRouter from './routes/events.js';
+import instituteDetailsRouter from "./routes/instituteDetailsRouter.js";
 
 dotenv.config();
 
@@ -16,6 +17,9 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/events', eventsRouter);
+
+app.use('/api/instituteDetails', instituteDetailsRouter);
+
 
 app.use((err, req, res, next) => {
     console.error('ERROR STACK:', err.stack || err);

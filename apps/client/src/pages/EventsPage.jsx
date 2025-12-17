@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { fetchEvents } from '../services/events.js';
+import React, {useEffect, useState} from 'react';
+import {Link} from 'react-router-dom';
+import {fetchEvents} from '../services/events.js';
 
 export default function EventsPage() {
   const [events, setEvents] = useState([]);

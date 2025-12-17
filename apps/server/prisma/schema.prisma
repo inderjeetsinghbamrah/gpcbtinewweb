@@ -18,3 +18,54 @@ model Event {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model State {
+  id      Int    @id @default(autoincrement())
+  name    String @unique
+  pincode String @unique
+
+  districts District[]
+}
+
+model District {
+  id   Int    @id @default(autoincrement())
+  name String
+  code String
+
+  state            State              @relation(fields: [stateId], references: [id], onDelete: Restrict)
+  stateId          Int
+  InstituteProfile InstituteProfile[]
+
+  @@unique([stateId, name])
+  @@index([stateId])
+}
+
+model InstituteProfile {
+  id                 String @id @default(cuid())
+  instituteCode      String @unique
+  name               String @unique
+  logo               String
+  instituteHeroImage String
+  aboutInstitute     String
+  history            String
+  mission            String
+  vision             String
+  principalMessage   String
+  principalPhoto     String
+  addressLine1       String
+  addressLine2       String
+
+  district District @relation(fields: [districtId], references: [id], onDelete: Restrict)
+
+  districtId    Int
+  contact       BigInt
+  emailID       String   @unique
+  facebookLink  String   @unique
+  linkedInLink  String   @unique
+  twitterLink   String   @unique
+  instagramLink String   @unique
+  youtubeLink   String   @unique
+  createdBy     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

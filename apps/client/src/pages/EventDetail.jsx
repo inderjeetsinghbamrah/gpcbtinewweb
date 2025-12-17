@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { fetchEvent } from '../services/events.js';
+import React, {useEffect, useState} from 'react';
+import {Link, useParams} from 'react-router-dom';
+import {fetchEvent} from '../services/events.js';
 
 export default function EventDetail() {
   const { id } = useParams();
