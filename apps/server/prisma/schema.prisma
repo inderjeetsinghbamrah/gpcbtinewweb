@@ -58,7 +58,7 @@ model InstituteProfile {
   district District @relation(fields: [districtId], references: [id], onDelete: Restrict)
 
   districtId    Int
-  contact       BigInt
+  contact       String   @unique @db.VarChar(15)
   emailID       String   @unique
   facebookLink  String   @unique
   linkedInLink  String   @unique

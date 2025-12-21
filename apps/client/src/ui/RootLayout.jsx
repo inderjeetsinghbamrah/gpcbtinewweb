@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {Outlet, useNavigation} from 'react-router-dom';
-import Header from './components/Header.jsx';
+import Header from './components/Header/Header.jsx';
 import Footer from './components/Footer.jsx';
 import {useLoader} from "./GlobalLoader.jsx";
 

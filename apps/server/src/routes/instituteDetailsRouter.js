@@ -9,9 +9,7 @@ const router = Router();
 router.get('/', async (_req, res, next) => {
     try {
 
-        const institute = await prisma.instituteProfile.findMany({
-            orderBy: { date: 'asc' }
-        });
+        const institute = await prisma.instituteProfile.findMany();
         res.json(institute);
     } catch (err) {
         next(err);
