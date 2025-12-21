@@ -49,16 +49,19 @@ export const Topbar = () => {
                     </div>
                     <div className="flex items-center space-x-6">
                         <div className="flex space-x-4 text-gray-400">
-                            <a href="#" className="hover:text-blue-600 transition">
+                            <a href={institute?.facebookLink} target="_blank" className="hover:text-blue-600 transition">
                                 <i className="fa-brands fa-facebook"></i>
                             </a>
-                            <a href="#" className="hover:text-blue-400 transition">
+                            <a href={institute?.twitterLink} target="_blank" className="hover:text-blue-400 transition">
                                 <i className="fa-brands fa-twitter"></i>
                             </a>
-                            <a href="#" className="hover:text-red-500 transition">
-                                <i className="fa-brands fa-google-plus"></i>
+                            <a href={institute?.youtubeLink} target="_blank" className="hover:text-red-500 transition">
+                                <i className="fa-brands fa-youtube"></i>
                             </a>
-                            <a href="#" className="hover:text-blue-700 transition">
+                            <a href={institute?.instagramLink} target="_blank" className="hover:text-red-300 transition">
+                                <i className="fa-brands fa-instagram"></i>
+                            </a>
+                            <a href={institute?.linkedInLink} target="_blank" className="hover:text-blue-700 transition">
                                 <i className="fa-brands fa-linkedin"></i>
                             </a>
                         </div>
