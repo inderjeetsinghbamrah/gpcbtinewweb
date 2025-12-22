@@ -1,131 +1,100 @@
-import {PrismaClient} from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const now = new Date();
-  const sample = [
-    {
-      title: 'Orientation Day',
-      description: 'Kick-off event for new students with campus tour and Q&A.',
-      date: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7),
-      location: 'Main Auditorium',
-      imageUrl: 'https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?q=80&w=1200&auto=format&fit=crop'
-    },
-    {
-      title: 'Tech Talk: Modern Web',
-      description: 'A deep dive into modern web development patterns and tooling.',
-      date: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 14),
-      location: 'Room B-204',
-      imageUrl: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop'
-    },
-    {
-      title: 'Career Fair 2025',
-      description: 'Meet recruiters and explore internship opportunities.',
-      date: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 30),
-      location: 'Exhibition Hall',
-      imageUrl: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop'
+
+    /* -------------------- STATES -------------------- */
+    const statesData = [
+        { name: 'Punjab', code: 'PB' },
+        { name: 'Haryana', code: 'HR' },
+        { name: 'Rajasthan', code: 'RJ' },
+        { name: 'Uttar Pradesh', code: 'UP' },
+        { name: 'Maharashtra', code: 'MH' },
+        { name: 'Gujarat', code: 'GJ' },
+        { name: 'Madhya Pradesh', code: 'MP' },
+        { name: 'Bihar', code: 'BR' },
+        { name: 'West Bengal', code: 'WB' },
+        { name: 'Tamil Nadu', code: 'TN' },
+        { name: 'Karnataka', code: 'KA' },
+        { name: 'Kerala', code: 'KL' },
+        { name: 'Telangana', code: 'TS' },
+        { name: 'Andhra Pradesh', code: 'AP' },
+        { name: 'Odisha', code: 'OD' },
+        { name: 'Chhattisgarh', code: 'CG' },
+        { name: 'Jharkhand', code: 'JH' },
+        { name: 'Assam', code: 'AS' },
+        { name: 'Himachal Pradesh', code: 'HP' },
+        { name: 'Uttarakhand', code: 'UK' }
+    ];
+
+    const states = {};
+    for (const s of statesData) {
+        states[s.code] = await prisma.state.create({ data: s });
     }
-  ];
 
-  for (const e of sample) {
-    await prisma.event.upsert({
-      where: { title: e.title },
-      create: e,
-      update: e
-    });
-  }
+    /* -------------------- DISTRICTS -------------------- */
+    const districtsData = [
+        { name: 'Bathinda', code: 'BTD', state: 'PB' },
+        { name: 'Ludhiana', code: 'LDH', state: 'PB' },
 
-    const maharashtra = await prisma.state.upsert({
-        where: { name: "Maharashtra" },
-        update: {},
-        create: {
-            name: "Maharashtra",
-            pincode: "400001"
-        }
-    });
+        { name: 'Gurugram', code: 'GGN', state: 'HR' },
+        { name: 'Hisar', code: 'HSR', state: 'HR' },
 
-    const gujarat = await prisma.state.upsert({
-        where: { name: "Gujarat" },
-        update: {},
-        create: {
-            name: "Gujarat",
-            pincode: "380001"
-        }
-    });
+        { name: 'Jaipur', code: 'JPR', state: 'RJ' },
+        { name: 'Kota', code: 'KTA', state: 'RJ' },
 
-    /**
-     * 2. DISTRICTS
-     */
-    const pune = await prisma.district.upsert({
-        where: {
-            stateId_name: {
-                stateId: maharashtra.id,
-                name: "Pune"
+        { name: 'Lucknow', code: 'LKO', state: 'UP' },
+        { name: 'Noida', code: 'NDA', state: 'UP' },
+
+        { name: 'Pune', code: 'PUN', state: 'MH' },
+        { name: 'Nagpur', code: 'NGP', state: 'MH' }
+    ];
+
+    const districts = {};
+    for (const d of districtsData) {
+        districts[d.code] = await prisma.district.create({
+            data: {
+                name: d.name,
+                code: d.code,
+                stateId: states[d.state].id
             }
-        },
-        update: {},
-        create: {
-            name: "Pune",
-            code: "PN",
-            stateId: maharashtra.id
-        }
-    });
+        });
+    }
 
-    const ahmedabad = await prisma.district.upsert({
-        where: {
-            stateId_name: {
-                stateId: gujarat.id,
-                name: "Ahmedabad"
-            }
-        },
-        update: {},
-        create: {
-            name: "Ahmedabad",
-            code: "AMD",
-            stateId: gujarat.id
-        }
-    });
+    /* -------------------- INSTITUTES (15) -------------------- */
+    const institutesData = Array.from({ length: 15 }).map((_, i) => ({
+        instituteCode: `GPC${100 + i}`,
+        name: `Government Polytechnic College ${i + 1}`,
+        logo: '/uploads/institutes/logo.svg',
+        instituteHeroImage: '/uploads/institutes/hero.jpg',
+        aboutInstitute: 'About institute',
+        history: 'Institute history',
+        mission: 'Institute mission',
+        vision: 'Institute vision',
+        principalMessage: 'Welcome message',
+        principalPhoto: '/uploads/institutes/principal.jpg',
+        addressLine1: 'Main Road',
+        addressLine2: 'Near Bus Stand',
+        city: 'City',
+        pincode: 151001,
+        stateId: states.PB.id,
+        districtId: districts.BTD.id,
+        contact: `98765432${10 + i}`,
+        emailID: `info${i}@gpc.edu`,
+        facebookLink: `https://facebook.com/gpc${i}`,
+        linkedInLink: `https://linkedin.com/gpc${i}`,
+        twitterLink: `https://twitter.com/gpc${i}`,
+        instagramLink: `https://instagram.com/gpc${i}`,
+        youtubeLink: `https://youtube.com/gpc${i}`,
+        createdBy: 'system'
+    }));
 
-    /**
-     * 3. INSTITUTE PROFILE
-     */
-    await prisma.instituteProfile.upsert({
-        where: { instituteCode: "INST001" },
-        update: {},
-        create: {
-            instituteCode: "INST001",
-            name: "ABC Institute of Technology",
-            logo: "/logos/abc.png",
-            instituteHeroImage: "/hero/abc.jpg",
-            aboutInstitute: "Premier technical institute",
-            history: "Established in 2005",
-            mission: "Quality education",
-            vision: "Future-ready graduates",
-            principalMessage: "Welcome to our institute",
-            principalPhoto: "/principal/abc.jpg",
-            addressLine1: "Main Road",
-            addressLine2: "Near City Center",
-            districtId: pune.id,
-            contact: BigInt("9876543210"),
-            emailID: "info@abcinstitute.edu",
-            facebookLink: "https://facebook.com/abcinstitute",
-            linkedInLink: "https://linkedin.com/company/abcinstitute",
-            twitterLink: "https://twitter.com/abcinstitute",
-            instagramLink: "https://instagram.com/abcinstitute",
-            youtubeLink: "https://youtube.com/@abcinstitute",
-            createdBy: "system"
-        }
-    });
+    await prisma.instituteProfile.createMany({ data: institutesData });
 
-  console.log('Seeded events');
+    console.log('✅ States, districts & institutes seeded successfully');
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+    .catch(console.error)
+    .finally(() => prisma.$disconnect());

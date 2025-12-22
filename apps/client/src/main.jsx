@@ -52,7 +52,11 @@ const router = createBrowserRouter([
             },
         ],
     },
-]);
+],{
+    future:{
+        v7_startTransition:true
+    },
+});
 
 createRoot(document.getElementById("root")).render(
 

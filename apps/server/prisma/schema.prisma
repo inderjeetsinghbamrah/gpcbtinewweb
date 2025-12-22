@@ -1,4 +1,3 @@
-// Prisma schema for Supabase Postgres
 generator client {
   provider = "prisma-client-js"
 }
@@ -6,6 +5,72 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model State {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  code String @unique
+
+  districts  District[]
+  institutes InstituteProfile[]
+
+  @@index([name])
+}
+
+model District {
+  id   Int    @id @default(autoincrement())
+  name String
+  code String
+
+  stateId Int
+  state   State @relation(fields: [stateId], references: [id], onDelete: Restrict)
+
+  institutes InstituteProfile[]
+
+  @@unique([stateId, name])
+  @@index([stateId])
+}
+
+model InstituteProfile {
+  id                 String @id @default(cuid())
+  instituteCode      String @unique
+  name               String @unique
+  yearOfEstb         Int
+  logo               String
+  instituteHeroImage String
+  aboutInstitute     String
+  history            String
+  mission            String
+  vision             String
+  principalMessage   String
+  principalPhoto     String
+
+  addressLine1 String
+  addressLine2 String
+  city         String
+  pincode      Int
+
+  stateId    Int
+  districtId Int
+
+  state    State    @relation(fields: [stateId], references: [id], onDelete: Restrict)
+  district District @relation(fields: [districtId], references: [id], onDelete: Restrict)
+
+  contact       String @unique @db.VarChar(15)
+  emailID       String @unique
+  facebookLink  String @unique
+  linkedInLink  String @unique
+  twitterLink   String @unique
+  instagramLink String @unique
+  youtubeLink   String @unique
+
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([stateId])
+  @@index([districtId])
 }
 
 model Event {
@@ -17,55 +82,4 @@ model Event {
   imageUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-}
-
-model State {
-  id      Int    @id @default(autoincrement())
-  name    String @unique
-  pincode String @unique
-
-  districts District[]
-}
-
-model District {
-  id   Int    @id @default(autoincrement())
-  name String
-  code String
-
-  state            State              @relation(fields: [stateId], references: [id], onDelete: Restrict)
-  stateId          Int
-  InstituteProfile InstituteProfile[]
-
-  @@unique([stateId, name])
-  @@index([stateId])
-}
-
-model InstituteProfile {
-  id                 String @id @default(cuid())
-  instituteCode      String @unique
-  name               String @unique
-  logo               String
-  instituteHeroImage String
-  aboutInstitute     String
-  history            String
-  mission            String
-  vision             String
-  principalMessage   String
-  principalPhoto     String
-  addressLine1       String
-  addressLine2       String
-
-  district District @relation(fields: [districtId], references: [id], onDelete: Restrict)
-
-  districtId    Int
-  contact       String   @unique @db.VarChar(15)
-  emailID       String   @unique
-  facebookLink  String   @unique
-  linkedInLink  String   @unique
-  twitterLink   String   @unique
-  instagramLink String   @unique
-  youtubeLink   String   @unique
-  createdBy     String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
 }
