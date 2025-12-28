@@ -69,6 +69,11 @@ model InstituteProfile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // 🔗 Relations
+  Slider  Slider[]
+  domains InstituteDomain[] // ✅ NEW
+  User    User[]
+
   @@index([stateId])
   @@index([districtId])
 }
@@ -82,4 +87,125 @@ model Event {
   imageUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+//Slider
+
+enum SliderTransition {
+  FADE
+  SLIDE
+  ZOOM
+  FLIP
+  CUBE
+  NONE
+}
+
+enum SliderDesign {
+  HERO
+  FULL_WIDTH
+  CARD
+  MINIMAL
+  THUMBNAIL
+}
+
+model Slider {
+  id String @id @default(cuid())
+
+  // 🔗 Institute reference
+  instituteId String
+  institute   InstituteProfile @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  // 🧠 Slider configuration
+  title       String
+  description String?
+
+  transition SliderTransition @default(FADE)
+  design     SliderDesign     @default(HERO)
+
+  autoplay       Boolean @default(true)
+  intervalMs     Int     @default(5000)
+  showIndicators Boolean @default(true)
+  showArrows     Boolean @default(true)
+
+  isActive Boolean @default(true)
+
+  // 📦 Relations
+  items SliderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([instituteId])
+}
+
+model SliderItem {
+  id String @id @default(cuid())
+
+  sliderId String
+  slider   Slider @relation(fields: [sliderId], references: [id], onDelete: Cascade)
+
+  // 🖼 Image data
+  imageUrl String
+  altText  String?
+
+  // 🔗 Optional CTA
+  linkUrl      String?
+  openInNewTab Boolean @default(false)
+
+  // 🎛 Control flags
+  isEnabled Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  // 🕒 Optional scheduling (future-ready)
+  visibleFrom DateTime?
+  visibleTo   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sliderId])
+  @@index([isEnabled])
+}
+
+//user
+
+enum UserRole {
+  SUPER_ADMIN
+  INSTITUTE_ADMIN
+  STAFF
+}
+
+model User {
+  id          String @id @default(cuid())
+  clerkUserId String @unique
+
+  email String   @unique
+  role  UserRole
+
+  instituteId String?
+  institute   InstituteProfile? @relation(fields: [instituteId], references: [id])
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([instituteId])
+}
+
+model InstituteDomain {
+  id String @id @default(cuid())
+
+  // Domain mapping
+  domain    String  @unique // gpc.ac.in | www.gpc.ac.in | admin.gpc.ac.in
+  isPrimary Boolean @default(false)
+  isActive  Boolean @default(true)
+
+  // Tenant binding
+  instituteId String
+  institute   InstituteProfile @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([instituteId])
 }

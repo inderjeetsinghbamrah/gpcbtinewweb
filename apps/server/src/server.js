@@ -17,6 +17,7 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
+
 app.use('/api/events', eventsRouter);
 
 app.use('/api/instituteDetails', instituteDetailsRouter);

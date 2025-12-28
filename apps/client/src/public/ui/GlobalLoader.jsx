@@ -1,5 +1,5 @@
 import {createContext, useContext, useState} from "react";
-import BookLoader from "./BookLoader";
+import BookLoader from "./BookLoader.jsx";
 
 const LoaderContext = createContext();
 
