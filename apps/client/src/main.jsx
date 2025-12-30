@@ -1,119 +1,116 @@
-import React, { lazy, Suspense } from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ClerkProvider } from "@clerk/clerk-react";
 
 import PublicLayout from "./public/layout/PublicLayout.jsx";
 import BufferedLoader from "./public/ui/BufferedLoader.jsx";
-import "./styles.css";
 import { LoaderProvider } from "./public/ui/GlobalLoader.jsx";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import AdminLayout from "./admin/layout/AdminLayout.jsx";
-import AuthGuard from "./guards/AuthGuard.jsx";
-import RoleGuard from "./guards/RoleGuard.jsx";
-import {AdminDashboard} from "./admin/Dashboard.jsx";
+import { ThemeProvider } from "@/providers/theme-provider";
 
-const Home = lazy(() => import("./public/pages/Home.jsx"));
-const CoursesPage = lazy(() => import("./public/pages/CoursesPage.jsx"));
-const EventsPage = lazy(() => import("./public/pages/EventsPage.jsx"));
-const EventDetail = lazy(() => import("./public/pages/EventDetail.jsx"));
+import "./styles.css";
 
-/* ---------------- React Query Client ---------------- */
+/* ---------- Lazy pages ---------- */
+
+const Home = React.lazy(() => import("./public/pages/Home.jsx"));
+const CoursesPage = React.lazy(() => import("./public/pages/CoursesPage.jsx"));
+const EventsPage = React.lazy(() => import("./public/pages/EventsPage.jsx"));
+const EventDetail = React.lazy(() => import("./public/pages/EventDetail.jsx"));
+const AdminDashboard = React.lazy(() => import("./admin/pages/Dashboard.jsx"))
+const Login = React.lazy(() => import("./admin/auth/Login.jsx"));
+
+/* ---------- React Query ---------- */
 
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            staleTime: 10 * 60 * 1000,        // 10 minutes
-            cacheTime: 30 * 60 * 1000,        // 30 minutes
+            staleTime: 10 * 60 * 1000,
+            cacheTime: 30 * 60 * 1000,
             retry: 1,
             refetchOnWindowFocus: false,
         },
     },
 });
 
-/* ---------------- Router ---------------- */
+/* ---------- Router ---------- */
 
-const router = createBrowserRouter(
-    [
-        /* ================= PUBLIC ================= */
-        {
-            path: "/",
-            element: <PublicLayout />,
-            children: [
-                {
-                    index: true,
-                    element: (
-                        <Suspense fallback={<BufferedLoader />}>
-                            <Home />
-                        </Suspense>
-                    ),
-                },
-                {
-                    path: "courses",
-                    element: (
-                        <Suspense fallback={<BufferedLoader />}>
-                            <CoursesPage />
-                        </Suspense>
-                    ),
-                },
-                {
-                    path: "events",
-                    element: (
-                        <Suspense fallback={<BufferedLoader />}>
-                            <EventsPage />
-                        </Suspense>
-                    ),
-                },
-                {
-                    path: "events/:id",
-                    element: (
-                        <Suspense fallback={<BufferedLoader />}>
-                            <EventDetail />
-                        </Suspense>
-                    ),
-                },
-            ],
-        },
-
-        /* ================= ADMIN ================= */
-        {
-            path: "/admin",
-            element: (
-                <AuthGuard>
-                    <RoleGuard allowed={["ADMIN"]}>
-                        <AdminLayout />
-                    </RoleGuard>
-                </AuthGuard>
-            ),
-            children: [
-                {
-                    index: true,
-                    element: (
-                        <Suspense fallback={<BufferedLoader />}>
-                            <AdminDashboard />
-                        </Suspense>
-                    ),
-                },
-            ],
-        },
-    ],
+const router = createBrowserRouter([
     {
-        future: {
-            v7_startTransition: true,
-        },
-    }
-);
+        path: "/",
+        element: <PublicLayout />,
+        children: [
+            {
+                index: true,
+                element: (
+                    <React.Suspense fallback={<BufferedLoader />}>
+                        <Home />
+                    </React.Suspense>
+                ),
+            },
+            {
+                path: "courses",
+                element: (
+                    <React.Suspense fallback={<BufferedLoader />}>
+                        <CoursesPage />
+                    </React.Suspense>
+                ),
+            },
+            {
+                path: "events",
+                element: (
+                    <React.Suspense fallback={<BufferedLoader />}>
+                        <EventsPage />
+                    </React.Suspense>
+                ),
+            },
+            {
+                path: "events/:id",
+                element: (
+                    <React.Suspense fallback={<BufferedLoader />}>
+                        <EventDetail />
+                    </React.Suspense>
+                ),
+            },
+        ],
+    },
+    {
+        path: "/admin",
+        element: <AdminLayout />, // guards live inside layout
+        children: [
+            {
+                index: true,
+                element: (
+                    <React.Suspense fallback={<BufferedLoader />}>
+                        <AdminDashboard />
+                    </React.Suspense>
+                ),
+            },
+        ],
+    },
+    {
+        path: "/login",
+        element: (
+            <React.Suspense fallback={<BufferedLoader />}>
+                <Login />
+            </React.Suspense>
+        ),
+    },
+]);
 
-
-
-/* ---------------- Render ---------------- */
+/* ---------- Render ---------- */
 
 createRoot(document.getElementById("root")).render(
     <React.StrictMode>
-        <QueryClientProvider client={queryClient}>
-            <LoaderProvider>
-                <RouterProvider router={router} />
-            </LoaderProvider>
-        </QueryClientProvider>
+        <ClerkProvider publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}>
+            <ThemeProvider defaultTheme="light">
+                <QueryClientProvider client={queryClient}>
+                    <LoaderProvider>
+                        <RouterProvider router={router} />
+                    </LoaderProvider>
+                </QueryClientProvider>
+            </ThemeProvider>
+        </ClerkProvider>
     </React.StrictMode>
 );

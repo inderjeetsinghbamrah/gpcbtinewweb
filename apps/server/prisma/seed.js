@@ -50,7 +50,7 @@ async function main() {
         update: {},
         create: {
             clerkUserId: "clerk_super_admin_id", // replace with real Clerk ID
-            email: "superadmin@platform.com",
+            email: "superadmin@eduobal.com",
             role: "SUPER_ADMIN",
         },
     });

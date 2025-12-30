@@ -1,17 +1,21 @@
-import {createContext, useContext, useState} from "react";
-import BookLoader from "./BookLoader.jsx";
+import { createContext, useContext, useState } from "react";
 
-const LoaderContext = createContext();
+const LoaderContext = createContext(null);
 
 export function LoaderProvider({ children }) {
-    const [visible, setVisible] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     return (
-        <LoaderContext.Provider value={{ visible, setVisible }}>
-            {visible && <BookLoader />}
+        <LoaderContext.Provider value={{ loading, setLoading }}>
             {children}
         </LoaderContext.Provider>
     );
 }
 
-export const useLoader = () => useContext(LoaderContext);
+export function useLoader() {
+    const ctx = useContext(LoaderContext);
+    if (!ctx) {
+        throw new Error("useLoader must be used inside LoaderProvider");
+    }
+    return ctx;
+}

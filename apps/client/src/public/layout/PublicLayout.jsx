@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Outlet, useNavigation } from "react-router-dom";
-import Header from "../ui/components/Header/Header.jsx";
-import Footer from "../ui/components/Footer.jsx";
+import Header from "@/public/ui/public-components/Header/Header.jsx";
+import Footer from "../ui/public-components/Footer.jsx";
 import { useLoader } from "../ui/GlobalLoader.jsx";
 import { useInstitute } from "../hooks/useInstitute.js";
 
