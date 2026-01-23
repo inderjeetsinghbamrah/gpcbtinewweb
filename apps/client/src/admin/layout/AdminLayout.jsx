@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
-import AuthGuard from "@/admin/guards/AuthGuard";
-import RoleGuard from "@/admin/guards/RoleGuard";
+import AuthGuard from "@/guards/AuthGuard";
+import RoleGuard from "@/guards/RoleGuard";
 import { ACCESS } from "@/admin/lib/access-policy.js";
 import {ThemeToggle} from "@/admin/admin-components/theme-toggle";
 

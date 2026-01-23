@@ -2,15 +2,19 @@
   "name": "gpcbtinewweb-monorepo",
   "private": true,
   "version": "1.0.0",
+
   "scripts": {
     "dev": "pnpm -r --parallel dev",
-    "build": "pnpm --filter ./apps/client build",
-    "start": "pnpm --filter ./apps/server start"
+    "build": "pnpm --filter client build",
+    "start": "pnpm --filter server start",
+
+    "prisma:generate": "pnpm --filter server prisma generate",
+    "prisma:migrate": "pnpm --filter server prisma migrate dev",
+    "prisma:deploy": "pnpm --filter server prisma migrate deploy",
+    "prisma:studio": "pnpm --filter server prisma studio"
   },
+
   "devDependencies": {
-    "prisma": "^7.1.0"
-  },
-  "dependencies": {
-    "@prisma/client": "^7.1.0"
+    "nodemon": "^3.1.0"
   }
 }

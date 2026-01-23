@@ -13,6 +13,35 @@ html {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
+@keyframes slowZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+.hero-zoom {
+  animation: slowZoom 14s ease-in-out infinite alternate;
+}
+
+.text-glow {
+  text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+}
+
+@keyframes vertical-scroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.news-scroll {
+  animation: vertical-scroll 18s linear infinite;
+}
+
+.news-scroll:hover {
+  animation-play-state: paused;
+}
 
 
 @layer base {

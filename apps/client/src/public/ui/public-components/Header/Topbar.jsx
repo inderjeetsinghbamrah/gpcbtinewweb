@@ -1,4 +1,5 @@
 import React, { memo } from "react";
+import DataLoader from "@/components/ui/DataLoader.jsx";
 
 export const Topbar = memo(({ instituteQuery }) => {
     const { data: institute, isLoading, isError } = instituteQuery;
@@ -13,7 +14,7 @@ export const Topbar = memo(({ instituteQuery }) => {
 
           <span>
             {isLoading ? (
-                <div className="h-4 w-48 bg-gray-700 rounded animate-pulse" />
+                <DataLoader/>
             ) : (
                 <>Welcome to {institute?.name}</>
             )}
@@ -55,7 +56,7 @@ export const Topbar = memo(({ instituteQuery }) => {
 
                             <div>
                                 <h1 className="text-lg md:text-2xl lg:text-3xl font-semibold text-gray-800">
-                                    {isLoading ? "Loading..." : institute?.name}
+                                    {isLoading ? <DataLoader/> : institute?.name}
                                 </h1>
 
                                 {!isLoading && (

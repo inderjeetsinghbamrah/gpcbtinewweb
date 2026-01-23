@@ -7,19 +7,19 @@ import { useInstitute } from "../hooks/useInstitute.js";
 
 export default function PublicLayout() {
     const navigation = useNavigation();
-    const { setVisible } = useLoader();
+    const { setLoading } = useLoader();
 
     // ✅ Fetch ONCE at layout level
     const instituteQuery = useInstitute();
 
     useEffect(() => {
         if (navigation.state === "loading") {
-            setVisible(true);
+            setLoading(true);
         } else {
-            const t = setTimeout(() => setVisible(false), 800);
+            const t = setTimeout(() => setLoading(false), 800);
             return () => clearTimeout(t);
         }
-    }, [navigation.state, setVisible]);
+    }, [navigation.state, setLoading]);
 
     return (
         <div className="min-h-screen flex flex-col font-roboto">
