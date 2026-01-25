@@ -1,5 +1,5 @@
-import React, { memo } from "react";
-import DataLoader from "@/components/ui/DataLoader.jsx";
+import React, {memo} from 'react';
+import DataLoader from '@/components/ui/DataLoader.jsx';
 
 export const Topbar = memo(({ instituteQuery }) => {
     const { data: institute, isLoading, isError } = instituteQuery;
@@ -62,14 +62,14 @@ export const Topbar = memo(({ instituteQuery }) => {
                                 {!isLoading && (
                                     <p className="text-xs md:text-sm text-gray-600">
                     <span className="md:hidden">
-                      {institute?.city}, {institute?.state?.name}
+                      {institute?.city?.name}, {institute?.state?.name}
                     </span>
 
                                         <span className="hidden md:inline">
                       {institute?.addressLine1}
                                             {institute?.addressLine2 && `, ${institute.addressLine2}`}
                                             <br />
-                                            {institute?.city}, {institute?.district?.name},{" "}
+                                            {institute?.city?.name}, {institute?.district?.name},{" "}
                                             {institute?.state?.name} {institute?.pincode}
                     </span>
                                     </p>

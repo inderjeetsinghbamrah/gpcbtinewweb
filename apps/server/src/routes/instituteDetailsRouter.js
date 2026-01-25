@@ -9,7 +9,7 @@ const router = Router();
 router.get('/', async (_req, res, next) => {
     try {
 
-        const instituteId = "cmkmhzws70001t72p34b9a80u"; // hard-coded for now
+        const instituteId = "cmksnbiap0001wg5mdu4og5nn"; // hard-coded for now
 
         const institute = await prisma.instituteProfile.findUnique({
             where: {
@@ -32,7 +32,7 @@ router.get('/', async (_req, res, next) => {
 
                 addressLine1: true,
                 addressLine2: true,
-                city: true,
+
                 pincode: true,
 
                 contact: true,
@@ -43,6 +43,13 @@ router.get('/', async (_req, res, next) => {
                         id: true,
                         name: true,        // ✅ State name
                     },
+                },
+
+                city:{
+                  select: {
+                      id: true,
+                      name: true
+                  }
                 },
 
                 district: {

@@ -8,10 +8,9 @@ datasource db {
 }
 
 model State {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-  code String @unique
-
+  id         Int                @id @default(autoincrement())
+  name       String             @unique
+  code       String             @unique
   districts  District[]
   institutes InstituteProfile[]
 
@@ -19,23 +18,34 @@ model State {
 }
 
 model District {
-  id   Int    @id @default(autoincrement())
-  name String
-  code String
-
-  stateId Int
-  state   State @relation(fields: [stateId], references: [id], onDelete: Restrict)
-
+  id         Int                @id @default(autoincrement())
+  name       String
+  code       String
+  stateId    Int
+  cities     City[]
+  state      State              @relation(fields: [stateId], references: [id])
   institutes InstituteProfile[]
 
   @@unique([stateId, name])
   @@index([stateId])
 }
 
+model City {
+  id         Int                @id @default(autoincrement())
+  name       String
+  code       String?
+  districtId Int
+  district   District           @relation(fields: [districtId], references: [id])
+  institutes InstituteProfile[]
+
+  @@unique([districtId, name])
+  @@index([districtId])
+}
+
 model InstituteProfile {
-  id                 String @id @default(cuid())
-  instituteCode      String @unique
-  name               String @unique
+  id                 String            @id @default(cuid())
+  instituteCode      String            @unique
+  name               String            @unique
   yearOfEstb         Int
   logo               String
   instituteHeroImage String
@@ -45,37 +55,85 @@ model InstituteProfile {
   vision             String
   principalMessage   String
   principalPhoto     String
-
-  addressLine1 String
-  addressLine2 String
-  city         String
-  pincode      Int
-
-  stateId    Int
-  districtId Int
-
-  state    State    @relation(fields: [stateId], references: [id], onDelete: Restrict)
-  district District @relation(fields: [districtId], references: [id], onDelete: Restrict)
-
-  contact       String @unique @db.VarChar(15)
-  emailID       String @unique
-  facebookLink  String @unique
-  linkedInLink  String @unique
-  twitterLink   String @unique
-  instagramLink String @unique
-  youtubeLink   String @unique
-
-  createdBy String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // 🔗 Relations
-  Slider  Slider[]
-  domains InstituteDomain[] // ✅ NEW
-  User    User[]
+  addressLine1       String
+  addressLine2       String
+  pincode            Int
+  stateId            Int
+  districtId         Int
+  contact            String            @unique @db.VarChar(15)
+  emailID            String            @unique
+  facebookLink       String            @unique
+  linkedInLink       String            @unique
+  twitterLink        String            @unique
+  instagramLink      String            @unique
+  youtubeLink        String            @unique
+  createdBy          String
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  cityId             Int
+  domains            InstituteDomain[]
+  city               City              @relation(fields: [cityId], references: [id])
+  district           District          @relation(fields: [districtId], references: [id])
+  state              State             @relation(fields: [stateId], references: [id])
+  navbarMenus        NavbarMenu[]
+  Slider             Slider[]
+  User               User[]
 
   @@index([stateId])
   @@index([districtId])
+  @@index([cityId])
+}
+
+model NavbarMenu {
+  id          String           @id @default(cuid())
+  instituteId String
+  title       String
+  slug        String
+  icon        String?
+  linkUrl     String?
+  isMegaMenu  Boolean          @default(false)
+  order       Int
+  isActive    Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  institute   InstituteProfile @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  subMenus    NavbarSubMenu[]
+
+  @@index([instituteId])
+}
+
+model NavbarSubMenu {
+  id          String         @id @default(cuid())
+  menuId      String
+  title       String
+  slug        String
+  linkUrl     String?
+  hasMegaMenu Boolean        @default(false)
+  order       Int
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  megaItems   MegaMenuItem[]
+  menu        NavbarMenu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
+
+  @@index([menuId])
+}
+
+model MegaMenuItem {
+  id          String        @id @default(cuid())
+  subMenuId   String
+  title       String
+  description String?
+  icon        String?
+  linkUrl     String?
+  columnGroup String?
+  order       Int
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  subMenu     NavbarSubMenu @relation(fields: [subMenuId], references: [id], onDelete: Cascade)
+
+  @@index([subMenuId])
 }
 
 model Event {
@@ -89,7 +147,70 @@ model Event {
   updatedAt   DateTime @updatedAt
 }
 
-//Slider
+model Slider {
+  id             String           @id @default(cuid())
+  instituteId    String
+  title          String
+  description    String?
+  transition     SliderTransition @default(FADE)
+  design         SliderDesign     @default(HERO)
+  autoplay       Boolean          @default(true)
+  intervalMs     Int              @default(5000)
+  showIndicators Boolean          @default(true)
+  showArrows     Boolean          @default(true)
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  institute      InstituteProfile @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  items          SliderItem[]
+
+  @@index([instituteId])
+}
+
+model SliderItem {
+  id           String    @id @default(cuid())
+  sliderId     String
+  imageUrl     String
+  altText      String?
+  linkUrl      String?
+  openInNewTab Boolean   @default(false)
+  isEnabled    Boolean   @default(true)
+  sortOrder    Int       @default(0)
+  visibleFrom  DateTime?
+  visibleTo    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  slider       Slider    @relation(fields: [sliderId], references: [id], onDelete: Cascade)
+
+  @@index([sliderId])
+  @@index([isEnabled])
+}
+
+model User {
+  id          String            @id @default(cuid())
+  clerkUserId String            @unique
+  email       String            @unique
+  role        UserRole
+  instituteId String?
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  institute   InstituteProfile? @relation(fields: [instituteId], references: [id])
+
+  @@index([instituteId])
+}
+
+model InstituteDomain {
+  id          String           @id @default(cuid())
+  domain      String           @unique
+  isPrimary   Boolean          @default(false)
+  isActive    Boolean          @default(true)
+  instituteId String
+  createdAt   DateTime         @default(now())
+  institute   InstituteProfile @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+
+  @@index([instituteId])
+}
 
 enum SliderTransition {
   FADE
@@ -108,104 +229,8 @@ enum SliderDesign {
   THUMBNAIL
 }
 
-model Slider {
-  id String @id @default(cuid())
-
-  // 🔗 Institute reference
-  instituteId String
-  institute   InstituteProfile @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-
-  // 🧠 Slider configuration
-  title       String
-  description String?
-
-  transition SliderTransition @default(FADE)
-  design     SliderDesign     @default(HERO)
-
-  autoplay       Boolean @default(true)
-  intervalMs     Int     @default(5000)
-  showIndicators Boolean @default(true)
-  showArrows     Boolean @default(true)
-
-  isActive Boolean @default(true)
-
-  // 📦 Relations
-  items SliderItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([instituteId])
-}
-
-model SliderItem {
-  id String @id @default(cuid())
-
-  sliderId String
-  slider   Slider @relation(fields: [sliderId], references: [id], onDelete: Cascade)
-
-  // 🖼 Image data
-  imageUrl String
-  altText  String?
-
-  // 🔗 Optional CTA
-  linkUrl      String?
-  openInNewTab Boolean @default(false)
-
-  // 🎛 Control flags
-  isEnabled Boolean @default(true)
-  sortOrder Int     @default(0)
-
-  // 🕒 Optional scheduling (future-ready)
-  visibleFrom DateTime?
-  visibleTo   DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([sliderId])
-  @@index([isEnabled])
-}
-
-//user
-
 enum UserRole {
   SUPER_ADMIN
   INSTITUTE_ADMIN
   STAFF
-}
-
-model User {
-  id          String @id @default(cuid())
-  clerkUserId String @unique
-
-  email String   @unique
-  role  UserRole
-
-  instituteId String?
-  institute   InstituteProfile? @relation(fields: [instituteId], references: [id])
-
-  isActive Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([instituteId])
-}
-
-model InstituteDomain {
-  id String @id @default(cuid())
-
-  // Domain mapping
-  domain    String  @unique // gpc.ac.in | www.gpc.ac.in | admin.gpc.ac.in
-  isPrimary Boolean @default(false)
-  isActive  Boolean @default(true)
-
-  // Tenant binding
-  instituteId String
-  institute   InstituteProfile @relation(fields: [instituteId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-
-  @@index([instituteId])
 }
