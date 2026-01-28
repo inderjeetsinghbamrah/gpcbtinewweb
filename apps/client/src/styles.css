@@ -5,6 +5,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  p{
+    @apply text-lg leading-relaxed
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -108,5 +114,51 @@ html {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+
+@layer components {
+  .video-overlay-border {
+    @apply relative overflow-hidden;
+  }
+
+  .video-overlay-border::before,
+  .video-overlay-border::after {
+    content: "";
+    @apply absolute opacity-0 pointer-events-none z-10;
+    inset: 40px;
+  }
+
+  /* TOP + BOTTOM (first) */
+  .video-overlay-border::before {
+    @apply border-t-4 border-b-4 border-instituteBrand;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition:
+            transform 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 0.4s ease;
+  }
+
+  /* LEFT + RIGHT (after delay) */
+  .video-overlay-border::after {
+    @apply border-l-4 border-r-4 border-instituteBrand;
+    transform: scaleY(0);
+    transform-origin: center;
+    transition:
+            transform 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 0.4s ease;
+    transition-delay: 0.25s;
+  }
+
+  /* HOVER */
+  .video-overlay-border:hover::before {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .video-overlay-border:hover::after {
+    opacity: 1;
+    transform: scaleY(1);
   }
 }

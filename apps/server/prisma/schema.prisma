@@ -46,10 +46,12 @@ model InstituteProfile {
   id                 String            @id @default(cuid())
   instituteCode      String            @unique
   name               String            @unique
+  shortName          String            @unique
   yearOfEstb         Int
   logo               String
   instituteHeroImage String
   aboutInstitute     String
+  aboutUs            String
   history            String
   mission            String
   vision             String
@@ -60,6 +62,7 @@ model InstituteProfile {
   pincode            Int
   stateId            Int
   districtId         Int
+  cityId             Int
   contact            String            @unique @db.VarChar(15)
   emailID            String            @unique
   facebookLink       String            @unique
@@ -70,7 +73,6 @@ model InstituteProfile {
   createdBy          String
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
-  cityId             Int
   domains            InstituteDomain[]
   city               City              @relation(fields: [cityId], references: [id])
   district           District          @relation(fields: [districtId], references: [id])

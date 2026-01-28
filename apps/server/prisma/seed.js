@@ -90,12 +90,14 @@ async function main() {
         create: {
             instituteCode: "GPC100",
             name: "Government Polytechnic College Bathinda",
+            shortName: "GPC Bathinda",
             yearOfEstb: 1950,
 
             logo: "/uploads/institutes/logo.svg",
             instituteHeroImage: "/uploads/institutes/hero.jpg",
 
             aboutInstitute: "About institute",
+            aboutUs: "About Us",
             history: "Institute history",
             mission: "Institute mission",
             vision: "Institute vision",

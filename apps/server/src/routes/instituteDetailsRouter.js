@@ -9,7 +9,7 @@ const router = Router();
 router.get('/', async (_req, res, next) => {
     try {
 
-        const instituteId = "cmksnbiap0001wg5mdu4og5nn"; // hard-coded for now
+        const instituteId = "cmkvi1ngp00018mf7b3heldu2"; // hard-coded for now
 
         const institute = await prisma.instituteProfile.findUnique({
             where: {
@@ -22,8 +22,9 @@ router.get('/', async (_req, res, next) => {
                 logo: true,
                 instituteHeroImage: true,
                 yearOfEstb: true,
-
+                shortName: true,
                 aboutInstitute: true,
+                aboutUs: true,
                 history: true,
                 mission: true,
                 vision: true,
