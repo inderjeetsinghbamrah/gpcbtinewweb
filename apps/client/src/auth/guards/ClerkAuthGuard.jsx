@@ -1,7 +1,7 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "@clerk/clerk-react";
+import {Navigate} from 'react-router-dom';
+import {useAuth} from '@clerk/clerk-react';
 
-export default function AuthGuard({ children }) {
+export function ClerkAuthGuard({ children }) {
     const { isSignedIn, isLoaded } = useAuth();
 
     if (!isLoaded) return null;

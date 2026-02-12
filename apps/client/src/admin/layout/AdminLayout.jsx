@@ -1,13 +1,13 @@
-import { Outlet } from "react-router-dom";
-import AuthGuard from "@/guards/AuthGuard";
-import RoleGuard from "@/guards/RoleGuard";
-import { ACCESS } from "@/admin/lib/access-policy.js";
-import {ThemeToggle} from "@/admin/admin-components/theme-toggle";
+import {Outlet} from 'react-router-dom';
+import {ClerkAuthGuard} from '@/auth/guards/ClerkAuthGuard.jsx';
+import {ClerkRoleGuard} from '@/auth/guards/ClerkRoleGuard.jsx';
+import {ACCESS} from '@/admin/lib/access-policy.js';
+import {ThemeToggle} from '@/admin/admin-components/theme-toggle';
 
 export default function AdminLayout() {
     return (
-        <AuthGuard>
-            <RoleGuard allow={ACCESS.ADMIN_AREA}>
+        <ClerkAuthGuard>
+            <ClerkRoleGuard allow={ACCESS.ADMIN_AREA}>
                 <div className="min-h-screen flex bg-background">
 
                     <aside className="w-64 border-r hidden md:flex">
@@ -26,7 +26,7 @@ export default function AdminLayout() {
                     </div>
 
                 </div>
-            </RoleGuard>
-        </AuthGuard>
+            </ClerkRoleGuard>
+        </ClerkAuthGuard>
     );
 }

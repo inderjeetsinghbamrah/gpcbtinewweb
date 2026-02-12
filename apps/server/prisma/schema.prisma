@@ -140,13 +140,11 @@ model MegaMenuItem {
 
 model Event {
   id          String   @id @default(cuid())
-  title       String   @unique
+  name        String
   description String
   date        DateTime
-  location    String
-  imageUrl    String?
+  imageURL    String[]
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }
 
 model Slider {
@@ -189,15 +187,17 @@ model SliderItem {
 }
 
 model User {
-  id          String            @id @default(cuid())
-  clerkUserId String            @unique
-  email       String            @unique
-  role        UserRole
-  instituteId String?
-  isActive    Boolean           @default(true)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  institute   InstituteProfile? @relation(fields: [instituteId], references: [id])
+  id           String            @id @default(cuid())
+  clerkUserId  String            @unique
+  email        String            @unique
+  role         UserRole
+  instituteId  String?
+  isActive     Boolean           @default(true)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  institute    InstituteProfile? @relation(fields: [instituteId], references: [id])
+  userSecurity UserSecurity?
+  userSessions UserSession[]
 
   @@index([instituteId])
 }
@@ -212,6 +212,26 @@ model InstituteDomain {
   institute   InstituteProfile @relation(fields: [instituteId], references: [id], onDelete: Cascade)
 
   @@index([instituteId])
+}
+
+model UserSecurity {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  forcePassword Boolean   @default(true)
+  forceProfile  Boolean   @default(true)
+  firstLoginAt  DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model UserSession {
+  id        String    @id @default(cuid())
+  userId    String
+  loginAt   DateTime  @default(now())
+  logoutAt  DateTime?
+  ipAddress String?
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 enum SliderTransition {

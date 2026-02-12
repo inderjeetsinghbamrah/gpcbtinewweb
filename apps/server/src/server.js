@@ -2,8 +2,13 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import eventsRouter from './routes/events.js';
-import instituteDetailsRouter from "./routes/instituteDetailsRouter.js";
-import * as path from "node:path";
+import instituteDetailsRouter from './routes/instituteDetailsRouter.js';
+import * as path from 'node:path';
+import clerkWebhook from '../api/webhooks/clerk.js';
+import meRouter from './routes/me.js';
+import securityRouter from './routes/security.js';
+import adminRouter from './routes/admin.js';
+import logoutRouter from './routes/logout.js';
 
 dotenv.config();
 
@@ -12,6 +17,14 @@ const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
+
+app.post("/api/webhooks/clerk", clerkWebhook);
+
+app.use("/api/me", meRouter);
+app.use("/api/security", securityRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/logout", logoutRouter);
+
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });

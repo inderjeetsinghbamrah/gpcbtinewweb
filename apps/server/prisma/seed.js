@@ -3,85 +3,79 @@ import {PrismaClient} from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log("🌱 Starting master seed...");
+    console.log("🌱 Starting Full System Seed...");
 
     /* ======================================================
        1️⃣ STATES
     ====================================================== */
 
-    const states = {};
+    const punjab = await prisma.state.upsert({
+        where: { code: "PB" },
+        update: {},
+        create: { name: "Punjab", code: "PB" },
+    });
 
-    const statesData = [
-        { name: "Punjab", code: "PB" },
-        { name: "Haryana", code: "HR" },
-    ];
-
-    for (const s of statesData) {
-        states[s.code] = await prisma.state.upsert({
-            where: { code: s.code },
-            update: {},
-            create: s,
-        });
-    }
+    const haryana = await prisma.state.upsert({
+        where: { code: "HR" },
+        update: {},
+        create: { name: "Haryana", code: "HR" },
+    });
 
     /* ======================================================
        2️⃣ DISTRICTS
     ====================================================== */
 
-    const districts = {};
-
-    const districtsData = [
-        { name: "Bathinda", code: "BTD", state: "PB" },
-        { name: "Ludhiana", code: "LDH", state: "PB" },
-    ];
-
-    for (const d of districtsData) {
-        districts[d.code] = await prisma.district.upsert({
-            where: {
-                stateId_name: {
-                    stateId: states[d.state].id,
-                    name: d.name,
-                },
+    const bathindaDistrict = await prisma.district.upsert({
+        where: {
+            stateId_name: {
+                stateId: punjab.id,
+                name: "Bathinda",
             },
-            update: {},
-            create: {
-                name: d.name,
-                code: d.code,
-                stateId: states[d.state].id,
+        },
+        update: {},
+        create: {
+            name: "Bathinda",
+            code: "BTD",
+            stateId: punjab.id,
+        },
+    });
+
+    const ludhianaDistrict = await prisma.district.upsert({
+        where: {
+            stateId_name: {
+                stateId: punjab.id,
+                name: "Ludhiana",
             },
-        });
-    }
+        },
+        update: {},
+        create: {
+            name: "Ludhiana",
+            code: "LDH",
+            stateId: punjab.id,
+        },
+    });
 
     /* ======================================================
        3️⃣ CITIES
     ====================================================== */
 
-    const cities = {};
-
-    const citiesData = [
-        { name: "Bathinda", code: "BTI", district: "BTD" },
-        { name: "Ludhiana", code: "LUD", district: "LDH" },
-    ];
-
-    for (const c of citiesData) {
-        cities[c.name] = await prisma.city.upsert({
-            where: {
-                districtId_name: {
-                    districtId: districts[c.district].id,
-                    name: c.name,
-                },
+    const bathindaCity = await prisma.city.upsert({
+        where: {
+            districtId_name: {
+                districtId: bathindaDistrict.id,
+                name: "Bathinda",
             },
-            update: {},
-            create: {
-                name: c.name,
-                code: c.code,
-                districtId: districts[c.district].id,
-            },
-        });
-    }
+        },
+        update: {},
+        create: {
+            name: "Bathinda",
+            code: "BTI",
+            districtId: bathindaDistrict.id,
+        },
+    });
 
     /* ======================================================
-       4️⃣ INSTITUTE
+       4️⃣ INSTITUTE PROFILE
     ====================================================== */
 
     const institute = await prisma.instituteProfile.upsert({
@@ -93,34 +87,34 @@ async function main() {
             shortName: "GPC Bathinda",
             yearOfEstb: 1950,
 
-            logo: "/uploads/institutes/logo.svg",
-            instituteHeroImage: "/uploads/institutes/hero.jpg",
+            logo: "/uploads/logo.svg",
+            instituteHeroImage: "/uploads/hero.jpg",
 
-            aboutInstitute: "About institute",
-            aboutUs: "About Us",
-            history: "Institute history",
-            mission: "Institute mission",
-            vision: "Institute vision",
+            aboutInstitute: "Premier government technical institute.",
+            aboutUs: "We provide diploma education.",
+            history: "Established in 1950.",
+            mission: "Skill development & innovation.",
+            vision: "Technical excellence.",
 
-            principalMessage: "Welcome to our institution",
-            principalPhoto: "/uploads/institutes/principal.jpg",
+            principalMessage: "Welcome to GPC Bathinda",
+            principalPhoto: "/uploads/principal.jpg",
 
             addressLine1: "Main Road",
             addressLine2: "Near Bus Stand",
             pincode: 151001,
 
-            stateId: states.PB.id,
-            districtId: districts.BTD.id,
-            cityId: cities.Bathinda.id,
+            stateId: punjab.id,
+            districtId: bathindaDistrict.id,
+            cityId: bathindaCity.id,
 
             contact: "9876543210",
             emailID: "info@gpcbathinda.ac.in",
 
             facebookLink: "https://facebook.com/gpcbathinda",
-            linkedInLink: "https://linkedin.com/gpcbathinda",
+            linkedInLink: "https://linkedin.com/company/gpcbathinda",
             twitterLink: "https://twitter.com/gpcbathinda",
             instagramLink: "https://instagram.com/gpcbathinda",
-            youtubeLink: "https://youtube.com/gpcbathinda",
+            youtubeLink: "https://youtube.com/@gpcbathinda",
 
             createdBy: "system",
         },
@@ -132,8 +126,7 @@ async function main() {
 
     await prisma.instituteDomain.createMany({
         data: [
-            { domain: "localhost", isPrimary: true, instituteId: institute.id },
-            { domain: "localhost:5173", instituteId: institute.id },
+            { domain: "gpcbathinda.ac.in", isPrimary: true, instituteId: institute.id },
             { domain: "localhost:3000", instituteId: institute.id },
         ],
         skipDuplicates: true,
@@ -143,29 +136,65 @@ async function main() {
        6️⃣ USERS
     ====================================================== */
 
-    await prisma.user.upsert({
+    const superAdmin = await prisma.user.upsert({
         where: { email: "superadmin@eduobal.com" },
         update: {},
         create: {
-            clerkUserId: "clerk_super_admin_id",
+            clerkUserId: "clerk_super_admin",
             email: "superadmin@eduobal.com",
             role: "SUPER_ADMIN",
         },
     });
 
-    await prisma.user.upsert({
+    const instituteAdmin = await prisma.user.upsert({
         where: { email: "admin@gpcbathinda.ac.in" },
         update: {},
         create: {
-            clerkUserId: "clerk_institute_admin_id",
+            clerkUserId: "clerk_institute_admin",
             email: "admin@gpcbathinda.ac.in",
             role: "INSTITUTE_ADMIN",
             instituteId: institute.id,
         },
     });
 
+    const staffUser = await prisma.user.upsert({
+        where: { email: "staff@gpcbathinda.ac.in" },
+        update: {},
+        create: {
+            clerkUserId: "clerk_staff",
+            email: "staff@gpcbathinda.ac.in",
+            role: "STAFF",
+            instituteId: institute.id,
+        },
+    });
+
     /* ======================================================
-       7️⃣ NAVBAR
+       7️⃣ USER SECURITY
+    ====================================================== */
+
+    await prisma.userSecurity.upsert({
+        where: { userId: instituteAdmin.id },
+        update: {},
+        create: {
+            userId: instituteAdmin.id,
+            forcePassword: true,
+            forceProfile: true,
+        },
+    });
+
+    /* ======================================================
+       8️⃣ USER SESSION
+    ====================================================== */
+
+    await prisma.userSession.create({
+        data: {
+            userId: instituteAdmin.id,
+            ipAddress: "127.0.0.1",
+        },
+    });
+
+    /* ======================================================
+       9️⃣ NAVBAR + MEGA MENU
     ====================================================== */
 
     const academicsMenu = await prisma.navbarMenu.create({
@@ -178,7 +207,7 @@ async function main() {
         },
     });
 
-    const departmentsSubMenu = await prisma.navbarSubMenu.create({
+    const deptSubMenu = await prisma.navbarSubMenu.create({
         data: {
             menuId: academicsMenu.id,
             title: "Departments",
@@ -191,89 +220,79 @@ async function main() {
     await prisma.megaMenuItem.createMany({
         data: [
             {
-                subMenuId: departmentsSubMenu.id,
+                subMenuId: deptSubMenu.id,
                 title: "Computer Science Engineering",
-                linkUrl: "/academics/departments/cse",
+                linkUrl: "/departments/cse",
                 order: 1,
             },
             {
-                subMenuId: departmentsSubMenu.id,
+                subMenuId: deptSubMenu.id,
                 title: "Mechanical Engineering",
-                linkUrl: "/academics/departments/me",
+                linkUrl: "/departments/me",
                 order: 2,
-            },
-            {
-                subMenuId: departmentsSubMenu.id,
-                title: "Civil Engineering",
-                linkUrl: "/academics/departments/ce",
-                order: 3,
             },
         ],
     });
 
     /* ======================================================
-       8️⃣ SLIDER
+       🔟 SLIDER + ITEMS
     ====================================================== */
 
-    const heroSlider = await prisma.slider.create({
+    const slider = await prisma.slider.create({
         data: {
             instituteId: institute.id,
-            title: "Homepage Hero Slider",
+            title: "Homepage Slider",
             transition: "FADE",
             design: "HERO",
             autoplay: true,
-            intervalMs: 5000,
-            isActive: true,
         },
     });
 
     await prisma.sliderItem.createMany({
         data: [
             {
-                sliderId: heroSlider.id,
-                imageUrl: "/uploads/slider/slide1.jpg",
+                sliderId: slider.id,
+                imageUrl: "/uploads/slide1.jpg",
                 altText: "Campus View",
                 sortOrder: 1,
-                isEnabled: true,
             },
             {
-                sliderId: heroSlider.id,
-                imageUrl: "/uploads/slider/slide2.jpg",
+                sliderId: slider.id,
+                imageUrl: "/uploads/slide2.jpg",
                 altText: "Admissions Open",
                 sortOrder: 2,
-                isEnabled: true,
             },
         ],
     });
 
     /* ======================================================
-       9️⃣ EVENTS
+       1️⃣1️⃣ EVENTS (Schema Corrected)
     ====================================================== */
 
     await prisma.event.createMany({
-        skipDuplicates: true,
         data: [
             {
-                title: "Annual Tech Symposium",
-                description: "State-level technical festival",
+                name: "Annual Tech Symposium",
+                description: "State level technical festival",
                 date: new Date("2025-02-15"),
-                location: "Main Auditorium",
+                imageURL: ["/uploads/events/event1.jpg"],
             },
             {
-                title: "Campus Placement Drive",
-                description: "Placement drive for final-year students",
+                name: "Placement Drive 2025",
+                description: "Campus recruitment drive",
                 date: new Date("2025-06-01"),
-                location: "Placement Cell",
+                imageURL: ["/uploads/events/event2.jpg"],
             },
         ],
+        skipDuplicates: true,
     });
 
-    console.log("✅ MASTER SEED COMPLETED SUCCESSFULLY");
+    console.log("✅ Full System Seed Completed Successfully");
 }
 
 main()
 .catch((e) => {
-    console.error("❌ Seed failed:", e);
+    console.error("❌ Seed Failed:", e);
     process.exit(1);
 })
 .finally(async () => {

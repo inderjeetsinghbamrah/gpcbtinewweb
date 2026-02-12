@@ -1,7 +1,7 @@
-import { Navigate } from "react-router-dom";
-import { useUserContext } from "@/admin/lib/user-context.jsx";
+import {Navigate} from 'react-router-dom';
+import {useUserContext} from '@/admin/lib/user-context.jsx';
 
-export default function RoleGuard({ allow, children }) {
+export function ClerkRoleGuard({ allow, children }) {
     const { role, loading } = useUserContext();
 
     if (loading) return null;
